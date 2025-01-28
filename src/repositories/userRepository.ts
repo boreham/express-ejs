@@ -9,9 +9,24 @@ export class UserRepository {
   }
 
   // Получение всех пользователей
-  async getAll(): Promise<User[]> {
-    const result: QueryResult = await this.client.query('SELECT * FROM users');
+  async getAllUsers(page: number, pageSize: number, sortBy: string, sortOrder: string): Promise<any[]> {
+    const offset = (page - 1) * pageSize;
+    const validSortColumns = ['id', 'name', 'email']; // Список допустимых полей для сортировки
+    const order = sortOrder === 'asc' ? 'ASC' : 'DESC'; // Сортировка по возрастанию или убыванию
+
+    // Если передано некорректное имя для сортировки, используем дефолтное значение
+    const validSortBy = validSortColumns.includes(sortBy) ? sortBy : 'id';
+
+    const query = `SELECT * FROM users ORDER BY ${validSortBy} ${order} LIMIT $1 OFFSET $2`;
+    const values = [pageSize, offset];
+
+    const result = await this.client.query(query, values);
     return result.rows;
+  }
+
+  async countUsers(): Promise<number> {
+    const result = await this.client.query('SELECT COUNT(*) FROM users');
+    return parseInt(result.rows[0].count, 10);
   }
 
   // Создание пользователя

@@ -2,8 +2,11 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';
 import userRoutes from './routes/userRoutes';
+import * as dotenv from 'dotenv';
 
 const app = express();
+
+dotenv.config();
 
 // Настройка EJS как шаблонизатора
 app.set('view engine', 'ejs');
@@ -18,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/users', userRoutes);
 
 // Запуск сервера
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });

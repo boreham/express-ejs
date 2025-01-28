@@ -5,22 +5,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="/css/bootstrap.min.css" rel="stylesheet">
-  <title>User Form</title>
+  <title>
+    <%= user.id ? 'Edit' : 'Create' %> User
+  </title>
 </head>
 
 <body>
-  <h1>
-    <%= user.id ? 'Edit' : 'Create' %> User
-  </h1>
-  <form action="<%= user.id ? '/users/' + user.id + '/update' : '/users' %>" method="POST">
-    <label>Name</label>
-    <input type="text" name="name" value="<%= user.name %>" required />
+  <div class="container mt-5">
+    <h1>
+      <%= user.id ? 'Edit' : 'Create' %> User
+    </h1>
 
-    <label>Email</label>
-    <input type="email" name="email" value="<%= user.email %>" required />
+    <!-- Форма для создания/редактирования пользователя -->
+    <form action="<%= user.id ? '/users/' + user.id + '/update' : '/users' %>" method="POST" novalidate>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" name="name" id="name" value="<%= user.name %>"
+          class="form-control <%= error && error.name ? 'is-invalid' : '' %>" required minlength="3" maxlength="50" />
+        <!-- Сообщение об ошибке -->
+        <% if (error && error.name) { %>
+          <div class="invalid-feedback">
+            <%= error.name %>
+          </div>
+          <% } %>
+      </div>
 
-    <button type="submit">Save</button>
-  </form>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" value="<%= user.email %>"
+          class="form-control <%= error && error.email ? 'is-invalid' : '' %>" required
+          pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" />
+        <!-- Сообщение об ошибке -->
+        <% if (error && error.email) { %>
+          <div class="invalid-feedback">
+            <%= error.email %>
+          </div>
+          <% } %>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+
+    <a href="/users" class="btn btn-secondary mt-3">Back to List</a>
+  </div>
 
   <script src="/js/bootstrap.bundle.min.js"></script>
 </body>

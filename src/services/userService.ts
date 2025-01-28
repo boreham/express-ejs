@@ -9,8 +9,17 @@ export class UserService {
   }
 
   // Получение всех пользователей
-  async getAllUsers(): Promise<User[]> {
-    return await this.userRepository.getAll();
+  async getAllUsers(page: number, pageSize: number, sortBy: string, sortOrder: string): Promise<any> {
+    const users = await this.userRepository.getAllUsers(page, pageSize, sortBy, sortOrder);
+    const totalUsers = await this.userRepository.countUsers();
+    const totalPages = Math.ceil(totalUsers / pageSize);
+
+    return {
+      users,
+      totalUsers,
+      totalPages,
+      currentPage: page
+    };
   }
 
   // Создание нового пользователя

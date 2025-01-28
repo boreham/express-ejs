@@ -9,9 +9,22 @@ const userService = new UserService(userRepository);
 export class UserController {
   // Получение всех пользователей
   async getAll(req: Request, res: Response): Promise<void> {
+    const page = parseInt(req.query.page as string) || 1;  // Получаем номер страницы
+    const pageSize = 5;  // Количество пользователей на одной странице
+    const sortBy = req.query.sortBy as string || 'id';  // Поле для сортировки (по умолчанию - id)
+    const sortOrder = req.query.sortOrder as string || 'asc';  // Порядок сортировки (по умолчанию - по возрастанию)
+
     try {
-      const users = await userService.getAllUsers();
-      res.render('userList', { users });
+      const { users, totalUsers, totalPages, currentPage } = await userService.getAllUsers(page, pageSize, sortBy, sortOrder);
+      res.render('userList', { 
+        users,
+        totalUsers,
+        totalPages,
+        currentPage,
+        pageSize,
+        sortBy,
+        sortOrder
+      });
     } catch (error) {
       res.status(500).send('Error retrieving users');
     }
@@ -19,13 +32,28 @@ export class UserController {
 
   // Показ формы для создания пользователя
   createForm(req: Request, res: Response): void {
-    res.render('userForm', { user: { name: '', email: '' } });
+    res.render('userForm', { user: { name: '', email: '' }, error: null });
   }
 
   // Создание пользователя
   async create(req: Request, res: Response): Promise<void> {
     const { name, email }: { name: string; email: string } = req.body;
     const user = { name, email };
+
+    // Валидация на сервере
+    const errors: { name?: string, email?: string } = {};
+
+    if (!name || name.length < 3 || name.length > 50) {
+      errors.name = 'Name must be between 3 and 50 characters.';
+    }
+
+    if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      errors.email = 'Email is invalid.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.render('userForm', { user, error: errors });
+    }
 
     try {
       const newUser = await userService.createUser(user);
@@ -41,7 +69,7 @@ export class UserController {
     try {
       const user = await userService.getUserById(id);
       if (user) {
-        res.render('userForm', { user });
+        res.render('userForm', { user, error: null });
       } else {
         res.status(404).send('User not found');
       }
@@ -55,6 +83,21 @@ export class UserController {
     const id = parseInt(req.params.id, 10);
     const { name, email }: { name: string; email: string } = req.body;
     const user = { name, email };
+
+    // Валидация на сервере
+    const errors: { name?: string, email?: string } = {};
+
+    if (!name || name.length < 3 || name.length > 50) {
+      errors.name = 'Name must be between 3 and 50 characters.';
+    }
+
+    if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA0-9]{2,}$/.test(email)) {
+      errors.email = 'Email is invalid.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.render('userForm', { user, error: errors });
+    }
 
     try {
       const updatedUser = await userService.updateUser(id, user);
