@@ -1,10 +1,28 @@
-<h1><%= user.id ? 'Edit' : 'Create' %> User</h1>
-<form action="<%= user.id ? '/users/' + user.id + '/update' : '/users' %>" method="POST">
-  <label>Name</label>
-  <input type="text" name="name" value="<%= user.name %>" required />
-  
-  <label>Email</label>
-  <input type="email" name="email" value="<%= user.email %>" required />
-  
-  <button type="submit">Save</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <title>User Form</title>
+</head>
+
+<body>
+  <h1>
+    <%= user.id ? 'Edit' : 'Create' %> User
+  </h1>
+  <form action="<%= user.id ? '/users/' + user.id + '/update' : '/users' %>" method="POST">
+    <label>Name</label>
+    <input type="text" name="name" value="<%= user.name %>" required />
+
+    <label>Email</label>
+    <input type="email" name="email" value="<%= user.email %>" required />
+
+    <button type="submit">Save</button>
+  </form>
+
+  <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
